@@ -1,6 +1,6 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { config as dotenvConfig } from "dotenv";
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
+import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { v4 as uuidv4 } from "uuid";
 
 // Load environment variables dari file .env
@@ -8,7 +8,7 @@ dotenvConfig();
 const llm_key = process.env.MODELSTUDIO_API_KEY;
 
 const llm = new ChatOpenAI({
-    model: "qwen-plus",
+    model: "qwen-turbo",
     apiKey: llm_key,
     temperature: 0.7,
     configuration: {
@@ -16,6 +16,8 @@ const llm = new ChatOpenAI({
     },
     streaming: true
 });
+
+
 
 // Map untuk menyimpan riwayat pesan berdasarkan thread ID
 const threadMessages = new Map<string, (HumanMessage | AIMessage)[]>();
