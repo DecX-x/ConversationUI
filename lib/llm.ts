@@ -17,11 +17,14 @@ const llm = new ChatOpenAI({
     streaming: true
 });
 
-
+// system message untuk memberikan konteks pada model
+const systemMessage = new SystemMessage({
+    content: `You are name is illumina, an helpful assistant. You can answer questions, provide explanations, and assist with various tasks. Please respond in a friendly and informative manner.`
+});
 
 // Map untuk menyimpan riwayat pesan berdasarkan thread ID
-const threadMessages = new Map<string, (HumanMessage | AIMessage)[]>();
-// Add streaming function for frontend
+const threadMessages = new Map<string, ( HumanMessage | AIMessage)[]>();
+// Add streaming function buat frontend
 export async function* streamChat(messages: { role: string, content: string }[], threadId: string) {
     if (!threadMessages.has(threadId)) {
         threadMessages.set(threadId, []);
@@ -29,8 +32,13 @@ export async function* streamChat(messages: { role: string, content: string }[],
     const history = threadMessages.get(threadId)!;
     const last = messages[messages.length - 1];
     history.push(new HumanMessage({ content: last.content }));
+
+    // Gabungkan system message dengan history
+    const messagesWithSystem = [systemMessage, ...history];
+
     const config = { configurable: { thread_id: threadId } };
-    const stream = await llm.stream(history, config);
+    // Kirim pesan gabungan ke metode stream
+    const stream = await llm.stream(messagesWithSystem, config);
     let responseContent = "";
     for await (const chunk of stream) {
         const content = typeof chunk.content === 'string' ? chunk.content : JSON.stringify(chunk.content);
