@@ -42,7 +42,7 @@ export function ChatWindow() {
       <div 
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto p-2 space-y-2 scroll-smooth"
+        className="flex-1 overflow-y-auto overflow-x-hidden p-2 space-y-2 scroll-smooth"
       >
         {messages.length === 0 ? (
           <motion.div 
