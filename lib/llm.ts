@@ -21,36 +21,6 @@ const llm = new ChatOpenAI({
 
 // Map untuk menyimpan riwayat pesan berdasarkan thread ID
 const threadMessages = new Map<string, (HumanMessage | AIMessage)[]>();
-
-// Export a function that can be used by other modules
-export const invokeChat = async (messages: { role: string, content: string }[], threadId: string = uuidv4()) => {
-    // Initialize thread if it doesn't exist
-    if (!threadMessages.has(threadId)) {
-        threadMessages.set(threadId, []);
-    }
-    
-    const messageHistory = threadMessages.get(threadId)!;
-    
-    // Add user message to history
-    const userMessage = new HumanMessage({ content: messages[messages.length - 1].content });
-    messageHistory.push(userMessage);
-    
-    // Create config object with thread ID
-    const config = { configurable: { thread_id: threadId } };
-    
-    // Get AI response
-    const response = await llm.invoke(messageHistory, config);
-    
-    // Add AI response to history
-    messageHistory.push(response);
-    
-    // Update message history in the map
-    threadMessages.set(threadId, messageHistory);
-    
-    // Return all messages in the conversation
-    return { messages: messageHistory };
-};
-
 // Add streaming function for frontend
 export async function* streamChat(messages: { role: string, content: string }[], threadId: string) {
     if (!threadMessages.has(threadId)) {
