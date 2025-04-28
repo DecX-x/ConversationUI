@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { SendIcon, ImageIcon, X } from 'lucide-react';
+import { ArrowRightCircle, ImageIcon, X , Square } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface MessageInputProps {
   onSendMessage: (message: string, image?: string) => void;
   isLoading: boolean;
+  onInterrupt?: () => void;
 }
 
-export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
+export function MessageInput({ onSendMessage, isLoading, onInterrupt }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const [image, setImage] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -86,14 +87,25 @@ export function MessageInput({ onSendMessage, isLoading }: MessageInputProps) {
           >
             <ImageIcon size={18} />
           </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            type="submit"
-            className="p-2 rounded-md text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!message.trim() || isLoading}
-          >
-            <SendIcon size={18} />
-          </motion.button>
+          {isLoading ? (
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              type="button"
+              onClick={onInterrupt}
+              className="p-2 rounded-md text-destructive hover:bg-destructive/10"
+            >
+              <Square size={18} />
+            </motion.button>
+          ) : (
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              type="submit"
+              className="p-2 rounded-md text-foreground hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!message.trim() || isLoading}
+            >
+              <ArrowRightCircle size={18} />
+            </motion.button>
+          )}
         </div>
         <input
           ref={fileInputRef}

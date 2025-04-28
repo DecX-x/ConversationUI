@@ -10,7 +10,7 @@ import { useChat } from '@/lib/hooks/use-chat';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export function ChatWindow() {
-  const { messages, isLoading, sendMessage, newMessageIndicator, clearNewMessageIndicator, newChat } = useChat();
+  const { messages, isLoading, sendMessage, newMessageIndicator, clearNewMessageIndicator, newChat, interrupt } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
@@ -92,7 +92,11 @@ export function ChatWindow() {
       )}
 
       <div className="p-2 border-t">
-        <MessageInput onSendMessage={sendMessage} isLoading={isLoading} />
+        <MessageInput
+          onSendMessage={sendMessage}
+          isLoading={isLoading}
+          onInterrupt={interrupt}
+        />
       </div>
     </div>
   );

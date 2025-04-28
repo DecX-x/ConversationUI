@@ -10,6 +10,7 @@ export function useChat() {
   const [newMessageIndicator, setNewMessageIndicator] = useState(false);
   const [threadId, setThreadId] = useState(() => uuidv4());
   const messagesRef = useRef(messages);
+  const controllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -42,10 +43,14 @@ export function useChat() {
     // build history up to new user message (assistant placeholder not sent)
     const history = [...messagesRef.current, userMessage];
     try {
+      // set up abort controller for interrupt
+      const controller = new AbortController();
+      controllerRef.current = controller;
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history, threadId })
+        body: JSON.stringify({ messages: history, threadId }),
+        signal: controller.signal
       });
       if (!res.ok || !res.body) throw new Error('Network response was not ok');
       const reader = res.body.getReader();
@@ -62,12 +67,21 @@ export function useChat() {
         }
       }
     } catch (error) {
-      updateMessage(assistantMessage.id, 'Error: ' + String(error));
+      if ((error as any).name !== 'AbortError') {
+        // On non-abort errors, show error text
+        updateMessage(assistantMessage.id, 'Error: ' + String(error));
+      }
     } finally {
       setIsLoading(false);
       setNewMessageIndicator(true);
     }
   }, [addMessage, threadId, updateMessage]);
+
+  const interrupt = useCallback(() => {
+    controllerRef.current?.abort();
+    setIsLoading(false);
+    setNewMessageIndicator(true);
+  }, []);
 
   const clearMessages = useCallback(() => {
     setMessages([]);
@@ -87,6 +101,7 @@ export function useChat() {
     messages,
     isLoading,
     sendMessage,
+    interrupt,
     clearMessages,
     newMessageIndicator,
     clearNewMessageIndicator,
