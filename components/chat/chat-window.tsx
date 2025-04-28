@@ -10,7 +10,7 @@ import { useChat } from '@/lib/hooks/use-chat';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export function ChatWindow() {
-  const { messages, isLoading, sendMessage, newMessageIndicator, clearNewMessageIndicator } = useChat();
+  const { messages, isLoading, sendMessage, newMessageIndicator, clearNewMessageIndicator, newChat } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isNearBottom, setIsNearBottom] = useState(true);
@@ -39,6 +39,15 @@ export function ChatWindow() {
 
   return (
     <div className="flex flex-col h-full relative">
+      {/* New chat control */}
+      <div className="flex justify-end p-2 border-b">
+        <button
+          onClick={newChat}
+          className="px-3 py-1 bg-primary text-primary-foreground rounded-md hover:opacity-90 transition"
+        >
+          New Chat
+        </button>
+      </div>
       <div 
         ref={scrollContainerRef}
         onScroll={handleScroll}

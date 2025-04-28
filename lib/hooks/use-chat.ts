@@ -8,7 +8,7 @@ export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [newMessageIndicator, setNewMessageIndicator] = useState(false);
-  const [threadId] = useState(() => uuidv4());
+  const [threadId, setThreadId] = useState(() => uuidv4());
   const messagesRef = useRef(messages);
 
   useEffect(() => {
@@ -73,6 +73,12 @@ export function useChat() {
     setMessages([]);
   }, []);
 
+  const newChat = useCallback(() => {
+    setThreadId(uuidv4());
+    clearMessages();
+    setNewMessageIndicator(false);
+  }, [clearMessages]);
+
   const clearNewMessageIndicator = useCallback(() => {
     setNewMessageIndicator(false);
   }, []);
@@ -83,6 +89,8 @@ export function useChat() {
     sendMessage,
     clearMessages,
     newMessageIndicator,
-    clearNewMessageIndicator
+    clearNewMessageIndicator,
+    newChat,
+    threadId
   };
 }
