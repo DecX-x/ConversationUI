@@ -8,7 +8,6 @@ import { ExamplePrompts } from '@/components/chat/example-prompts';
 import { NewMessageIndicator } from '@/components/chat/new-message-indicator';
 import { useChat } from '@/lib/hooks/use-chat';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowDownCircle } from 'lucide-react';
 
 export function ChatWindow() {
   const { messages, isLoading, sendMessage, newMessageIndicator, clearNewMessageIndicator } = useChat();
@@ -53,10 +52,12 @@ export function ChatWindow() {
           >
             <div className="max-w-2xl w-full space-y-4">
               <div className="text-center space-y-2">
+              <div className="text-center space-y-2">
                 <h2 className="text-2xl font-semibold">How can I help you today?</h2>
                 <p className="text-muted-foreground">
-                  Ask me anything, and I'll do my best to provide a helpful response.
+                  Ask me anything, and I&apos;ll do my best to provide a helpful response.
                 </p>
+              </div>
               </div>
               <ExamplePrompts onSelectPrompt={sendMessage} />
             </div>

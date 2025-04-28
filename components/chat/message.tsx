@@ -1,11 +1,12 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image'; // Import next/image
 import { Message as MessageType } from '@/lib/types';
 import { User, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { Components } from 'react-markdown'; // Import Components type
 import remarkGfm from 'remark-gfm';
 
 interface MessageProps {
@@ -35,38 +36,57 @@ export function Message({ message }: MessageProps) {
       </div>
       <div className="flex-1 space-y-2">
         <div className="text-sm font-medium">
-          {isUser ? 'You' : 'AI Assistant'}
         </div>
         <div className="text-foreground space-y-4">
           {message.image && (
-            <img src={message.image} alt="Uploaded content" className="max-w-sm rounded-lg" />
+            // Use next/image for optimization
+            <div className="relative w-full max-w-sm aspect-square"> {/* Adjust aspect ratio as needed */}
+              <Image
+                src={message.image}
+                alt="Uploaded content"
+                fill // Use fill layout
+                className="rounded-lg object-contain" // Adjust object-fit as needed
+              />
+            </div>
           )}
           <div className="prose prose-sm max-w-full dark:prose-invert">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                code({ inline, className, children, ...props }) {
+                // Use div for paragraphs to avoid hydration errors with nested blocks
+                p({node, children, ...props}) {
+                  // Check if the paragraph only contains a single code block
+                  // This check might need refinement based on actual node structure
+                  if (React.isValidElement(children) && Array.isArray(children) && children.length === 1 && children[0].props?.node?.tagName === 'code' && !children[0].props?.inline) {
+                    return <>{children}</>; // Render code block directly without wrapping div/p
+                  }
+                  return <div {...props} className="whitespace-pre-wrap mb-2 last:mb-0">{children}</div>;
+                },
+                // Explicitly type props for code component
+                code({ node, inline, className, children, ...props }: { node?: any; inline?: boolean; className?: string; children?: React.ReactNode }) {
                   const match = /language-(\w+)/.exec(className || '');
                   return !inline ? (
-                    <div className="relative mt-2 rounded-lg bg-accent/50">
-                      {match && (
+                    // Render pre directly to avoid div inside p hydration error
+                    <pre className={cn(
+                      "relative mt-2 rounded-lg bg-accent/50 overflow-x-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent",
+                      className // Pass className to pre for language styling
+                    )} {...props}>
+                       {match && (
                         <div className="absolute top-2 right-2 text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
                           {match[1]}
                         </div>
                       )}
-                      <pre className="overflow-x-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-                        <code className={`${className} block p-4 text-sm font-mono`} {...props}>
-                          {children}
-                        </code>
-                      </pre>
-                    </div>
+                      <code className="block p-4 text-sm font-mono"> {/* Remove className from code tag if passed to pre */}
+                        {children}
+                      </code>
+                    </pre>
                   ) : (
-                    <code className="bg-muted px-1 rounded text-sm font-mono" {...props}>
+                    <code className={cn("bg-muted px-1 rounded text-sm font-mono", className)} {...props}>
                       {children}
                     </code>
                   );
                 }
-              }}
+              } as Components } // Assert type for components object
             >
               {message.content}
             </ReactMarkdown>
