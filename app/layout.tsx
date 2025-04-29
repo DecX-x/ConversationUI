@@ -7,7 +7,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Chat',
+  title: 'Illumina.',
   description: 'zzz💀I',
 };
 
@@ -23,7 +23,7 @@ export default function RootLayout({
           <div className="flex flex-col min-h-screen">
             <header className="sticky top-0 z-10 backdrop-blur-md bg-background/80 border-b border-border/40">
               <div className="container mx-auto px-2 py-2 flex items-center justify-between">
-                <span className="text-xl font-semibold">Chat</span>
+                <span className="text-xl font-semibold">Illumina.</span>
                 <ThemeToggle />
               </div>
             </header>
