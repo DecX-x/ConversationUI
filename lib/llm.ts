@@ -8,7 +8,7 @@ dotenvConfig();
 const llm_key = process.env.MODELSTUDIO_API_KEY;
 
 const llm = new ChatOpenAI({
-    model: "qwen-turbo-latest",
+    model: "qwen-turbo",
     apiKey: llm_key,
     temperature: 0.7,
     configuration: {
